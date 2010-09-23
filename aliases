@@ -1,0 +1,379 @@
+## Safety ##
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+
+## Navigation ##
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+## Improved output ##
+alias df='df -h'
+alias diff='colordiff'
+alias dirsize='du -hs'
+alias du='du -h'
+alias egrep='egrep --color'
+alias free='free -m'
+alias grep='grep --color'
+alias zrep='zgrep --color'
+alias rsync='rsync -h'
+alias pgrep='pgrep -l'
+
+## Convenience ##
+alias ack='ack --text'
+alias chterm='sudo update-alternatives --config x-terminal-emulator'
+alias cmdphp='/usr/local/apache2/bin/php'
+alias cpan='sudo perl -MCPAN -e shell'
+alias cputemp='cat /proc/acpi/thermal_zone/THM*/temperature'
+alias h="history -1 | sed 's/^\s*[0-9]\+\s*//'"
+alias l.='ls -dF .[a-zA-Z0-9]*'
+alias la='ls -a'
+alias ld.='ls -d .*/'
+alias ld='ls -d */'
+alias lf.='ls .*(.)'
+alias lf='ls *(.)'
+alias ll='ls -lh'
+alias lsvms='vmls'
+alias lt='ls -t1'
+alias mkdir='mkdir -p'
+alias nt='python setup.py -q nosetests'
+alias pg='ps ax | grep'
+alias psg='ps ax | grep'
+alias realpath='readlink -f'
+alias s='sudo -s'
+alias sup='svn up ~/svn/{packages,trunk,system,database,api}'
+alias taggable="svn diff -r \$(svn log ../tags/\$(ls ../tags | sort -n -t . -k 1,1 -k 2,2 -k 3,3 | tail -n1) --stop-on-copy -q | grep ^r | awk '{print \$1}' | sed 's/r//'):HEAD --summarize"
+alias trickle='trickle -d 30'
+alias vmls='ssh nebula "ls /storage/vms/*avatar* | sort -r"'
+alias xx='exit'
+alias xxs='touch /tmp/stayloggedin && exit'
+
+## Troubleshooting ##
+alias pscpu="ps -e -o pcpu,cpu,nice,state,cputime,args --sort -pcpu | sed '/^ 0.0 /d'"
+alias psmem="ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS"
+
+## Utility ##
+alias ping='ping -c 3'
+#alias ssh='ssh -Y' # removed as it interferes with ssh hostname completion
+alias unbz2='tar xjf'
+alias untgz='tar xzf'
+alias wget='wget -c'
+alias whichdb='grep aweber_app:live -A1 ~/svn/system/config/etc/database_login.ini | tail -n1 | cut -d= -f2'
+
+## Fast fingers ##
+alias dkpg='dpkg'
+alias dkpg-buildpackage='dpkg-buildpackage'
+alias eixt='exit'
+alias exi='exit'
+alias :q='exit'
+alias snv='svn'
+alias sqpl='sqlp'
+
+## Logs ##
+alias addleadlog='ssh log1 tail -f /storage/logs/addlead.pl.log'
+alias apachelog='ssh log1 tail -f /storage/logs/access_log_aweber'
+alias bclog='ssh mail4 tail -f /home/aweber/logs/broadcast_parent.`date +"%F"`.log'
+alias devapachelog='ssh log1 tail -f /storage/logs/access_logs_awebertest'
+alias phplog='ssh log1 tail -f /storage/logs/php_error_log'
+alias pglog='ssh log1 sudo tail -f /data1/pgsql/data/pg_log/postgresql-`date +"%d"`.log'
+
+## Functions ##
+
+# Sum a list of numbers.
+add (){
+   if test -n "$1"
+   then
+      cat "$1" | awk '{sum += $1} END {print sum}'
+   else
+      (while read line; do echo $line; done) | awk '{sum += $1} END {print sum}'
+   fi
+}
+
+# Define prompt colors for a dark background.
+alias darkgb=bgdark
+function bgdark() {
+   define_colors
+
+   C1="$YELLOW_BOLD"
+   C2="$GRAY"
+   C3="$PURPLE_BOLD"
+   C4="$PURPLE_BOLD"
+   C5="$C3"
+   C6="$NORMAL"
+   C7="$GREEN_BOLD"
+   C8="$C2"
+   C9="$NORMAL"
+
+   if [ "`id -u`" -eq 0 ]; then
+      C3="$RED_BOLD"
+      C9="$RED_BOLD"
+   fi
+
+   if [[ "$SERVERTYPE" == critical ]]; then
+      C5="$RED_BOLD"
+   fi
+
+   set_prompt
+}
+
+# Define prompt colors for a light background.
+alias lightbg=bglight
+function bglight() {
+   define_colors
+
+   C1="$YELLOW"
+   C2="$NORMAL"
+   C3="$CYAN"
+   C4="$CYAN_BOLD"
+   C5="$C3"
+   C6="$NORMAL"
+   C7="$GREEN"
+   C8="$C2"
+   C9="$NORMAL"
+
+   if [ "`id -u`" -eq 0 ]; then
+      C3="$RED"
+      C9="$RED"
+   fi
+
+   set_prompt
+}
+
+# Run cake testcase.
+function caketestcase () {
+    php -q /home/sites/cake_core/1.2b/cake/console/cake.php -app /home/sites/$1 testsuite app case $2
+}
+
+# Run cake testgroup.
+function caketestgroup () {
+    php -q /home/sites/cake_core/1.2b/cake/console/cake.php -app /home/sites/$1 testsuite app group $2
+}
+
+# Automatically do an ls after each cd.
+cd() {
+    if [ -n "$1" ]; then
+        builtin cd "$@" && ls
+    else
+        builtin cd ~ && ls
+    fi
+}
+
+# Copy and go to dir.
+cpg (){
+  if [ -d "$2" ];then
+    cp $1 $2 && cd $2
+  else
+    cp $1 $2
+  fi
+}
+
+# Find and display top 10 files/directories.
+function dutop () {
+   if [ "$1" ]; then
+      LOC="$1"
+   else
+      LOC="$PWD"
+   fi
+
+   TOP=10
+   if [ "$2" ]; then
+      if [[ $2 != *[^0-9]* ]]; then
+         TOP="$2"
+      fi
+   fi
+
+   sudo du -a "$LOC" | sort -nr | head -n $TOP | cut -f 2- | while read a; do sudo du -sh "$a"; done
+}
+
+# Remove cruft recursively.
+function decruft () {
+    rm -f **/*.pyc
+    rm -f **/svn-commit.tmp
+    rm -rf **/*.egg-info
+}
+
+# Uncompress a file. Also see package unp.
+unpack () {
+   if [ ! -n "$1" ]; then
+      echo "usage: $0 filename.<7z|Z|bz2|gz|lzma|rar|tar|tar.bz2|tar.gz|tbz2|tgz|zip>"
+      return
+   fi
+
+   if [ -f "$1" ]; then
+      case $1 in
+         *.7z)        7z x $1 ;;
+         *.Z)         uncompress $1 ;;
+         *.bz2)       bunzip2 $1 ;;
+         *.gz)        gunzip $1 ;;
+         *.lzma)      unlzma -cd $1 | tar -xf- ;;
+         *.rar)       rar x $1 ;;
+         *.tar.bz2)   tar xjf $1 ;;
+         *.tar.gz)    tar xzf $1 && tar xf ${1%.gz} ;;
+         *.tar)       tar xf $1 ;;
+         *.tbz2)      tar xjf $1 ;;
+         *.tgz)       tar xzf $1 ;;
+         *.zip)       unzip $1 ;;
+         *)           echo "'$1' cannot be extracted via unpack()" ;;
+      esac
+   else
+      #*.lzma)      unlzma $1 && tar xf ${1%.lzma} ;;
+      echo "'$1' is not a valid file"
+   fi
+}
+
+# Echo a specific line of a file.
+line (){
+   if test -n "$2"
+   then
+      head -n "$1" "$2" | tail -n 1
+   else
+      (while read line; do echo $line; done) | head -n "$1" | tail -n 1
+   fi
+}
+
+# Compare directory listings.
+lscmp (){
+   comm <(ls "$1") <(ls "$2")
+}
+
+function lookup_pkg () {
+    pkg="$1"
+    echo -n "==[$pkg]";printf "%$((59 - $((${#pkg} + 4))))s\n"|tr ' ' '='
+    echo "Production"
+    lynx -dump -listonly http://repo/ubuntu-custom/hardy-aw/packages/ | grep "$1_" | sed 's/.*_\(.*\)_.*/\1/' | sed 's/^/  /'
+    echo "\nDevel"
+    lynx -dump -listonly http://repo/ubuntu-custom/hardy-aw-dev/packages/ | grep "$1_" | sed 's/.*_\(.*\)_.*/\1/' | sed 's/^/  /'
+    echo
+    echo
+}
+
+function rdeps () {
+    for pkg in $(apt-rdepends "$1" | sed 's/^  Depends: //' | awk '{print $1}' | sort | uniq); do; [ -d "/opt/packages/$pkg" ] && lookup_pkg "$pkg"; done
+}
+
+# Echo a specific line of a file (good for many).
+manyline (){
+   grep -n . "$2" | sed 's/^[^:]*://' | grep "^$1:" | sed "s/^$1://"
+}
+
+# Make and go to dir.
+mkdirg () {
+   mkdir "$1" && cd "$1"
+}
+
+# Move and go to dir.
+mvg (){
+  if [ -d "$2" ];then
+    mv $1 $2 && cd $2
+  else
+    mv $1 $2
+  fi
+}
+
+pkg () {
+    if [ -d /opt/packages ]; then
+        PKGDIR=/opt/packages
+    elif [ -d ~/svn/packages ]; then
+        PKGDIR=~/svn/packages
+    else
+        echo "Package directory unknown"
+        return
+    fi
+
+    if [ -n "$1" ]; then
+        for dir in "$PKGDIR/$1/trunk" "$PKGDIR/$1"; do
+            if [ -d "$dir" ]; then
+                echo "Found package $PKGDIR/$1"
+                echo
+                builtin cd "$dir"
+                ls
+                return
+            fi
+        done
+        for pkg in `find -L "$PKGDIR" -maxdepth 1 -type d -name "*$1*" -print`; do
+            echo "Found package $pkg"
+            echo
+            if [ -d "$pkg/trunk" ]; then
+                builtin cd "$pkg/trunk"
+            else
+                builtin cd "$pkg"
+            fi
+            ls
+            return
+        done
+        echo "Package not found: $1"
+    else
+        builtin cd $PKGDIR
+        ls
+    fi
+}
+
+# Find processes to kill and kill them.
+pskill () {
+    for pid in $(ps -U ${USER} | grep $1 | awk '{print $1}')
+    do
+        echo -n "Killing $1 (process $pid)..."
+        kill -9 $pid
+        echo "killed."
+    done
+}
+
+# Search for various types of README files in dir and display them in $PAGER.
+readme () {
+   local files
+   #files=(./(#i)*(read*me|lue*m(in|)ut)*(ND))
+   files=`ls | grep -i readme`
+   if (($#files))
+   then $PAGER $files
+   else
+      print 'No README files.'
+   fi
+}
+
+# Recursive grep that ignores svn directories/files.
+function svngrep () {
+   # Last arg should be the path
+   case "$SHELL" in
+      '/bin/zsh')
+         LAST="${@[$#]}"
+         ;;
+      '/bin/bash')
+         LAST="${!#}"
+         ;;
+   esac
+
+   if [[ -d $LAST ]]; then
+      LOC="$LAST"
+   else
+      LOC=`pwd`
+   fi
+
+   find "$LOC" -path '*/.svn' -prune -o -type f -print | xargs grep --color "$@"
+}
+
+# Automatically use sudo for non-writable files.
+vi () {
+    VIM=`builtin which vim`
+    if [ -f "$@" ]; then
+        if [ -w "$@" ]; then
+            $VIM "$@"
+        else
+            sudo $VIM "$@"
+        fi
+    else
+        $VIM "$@"
+    fi
+}
+
+# Also cat the file if it's in ~/bin and is short
+which () {
+    builtin which "$@"
+    WHICH=`builtin which "$@" | head -n1`
+    if echo $WHICH | egrep -q 'jimf/bin'; then
+        if [ "`wc -l $WHICH | awk '{print $1}'`" -le 30 ]; then
+            echo
+            cat $WHICH
+        fi
+    fi
+}

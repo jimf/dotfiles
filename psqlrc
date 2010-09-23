@@ -1,0 +1,28 @@
+-- Enable quite mode --
+\set QUIET 1
+
+-----------------
+-- ENVIRONMENT --
+-----------------
+\pset null '[NULL]'
+\timing
+
+\set ORIGPROMPT '%/%R%# '
+\set sp `if test -n "$PGSEARCHPATH"; then echo "$PGSEARCHPATH"; else echo "public"; fi`
+
+\set PROMPT1 '%[%033[1;33m%]%`date +%R` %[%033[1;30m%](%[%033[1;35m%]%n%[%033[1;35m%]@%[%033[1;35m%]%m%[%033[0;37m%]: %[%033[1;32m%]%/%[%033[1;30m%])%[%033[0m%]%R%#%x '
+\set PROMPT2 '%[%033[1;33m%]%`date +%R` %[%033[1;30m%](%[%033[1;35m%]%n%[%033[1;35m%]@%[%033[1;35m%]%m%[%033[0;37m%]: %[%033[1;32m%]%/%[%033[1;30m%])%[%033[0m%]%R%#%x '
+\set PROMPT3 '>> '
+
+\echo 'SET search_path TO' :sp
+set search_path = :sp;
+
+-------------
+-- HISTORY --
+-------------
+\set HISTCONTROL ignoreboth
+\set HISTSIZE 5000
+
+\set QUIET 0
+\unset QUIET
+-- Disable quite mode --
