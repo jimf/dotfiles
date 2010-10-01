@@ -1,0 +1,7 @@
+[nosetests]
+verbosity=3
+with-color=true
+with-spec=true
+stop=true
+nocapture=true
+match=((?:^|[b_.-])(:?[Tt]est|When|should|[Dd]escribe))
