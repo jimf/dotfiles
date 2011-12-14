@@ -11,8 +11,9 @@
 (( ${+LESSOPEN} )) || export LESSOPEN='|lesspipe.sh %s'
 (( ${+CC} )) || export CC='gcc'
 (( ${+TERM} )) || export TERM='xterm-256color'
-(( ${+SVN_EDITOR} )) || export SVN_EDITOR='vim -f --noplugin'
-(( ${+DATE} )) || export DATE=`date +%F`
+#(( ${+SVN_EDITOR} )) || export SVN_EDITOR='vim -f --noplugin'
+(( ${+SVN_EDITOR} )) || export SVN_EDITOR=`which vim`
+(( ${+DATE} )) || export DATE=`date +%m-%d`
 (( ${+VERSIONER_PERL_PREFER_32_BIT} )) || export VERSIONER_PERL_PREFER_32_BIT=yes
 
 # Colorize manpages:
@@ -34,6 +35,10 @@ case "$HOSTNAME" in
         export PGHOST='localhost'
         export SERVERTYPE='dev'
         ;;
+    labs|sylph)
+        unset PGHOST
+        export SERVERTYPE='dev'
+        ;;
     dev*)
         export SERVERTYPE='dev'
         ;;
@@ -47,7 +52,8 @@ esac
 # SET PATHS:                                                                  #
 ###############################################################################
 # Path and cdpath:
-path=(~/bin /usr/local/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+setopt extended_glob
+path=(~/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin /usr/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 cdpath=(. ~ ~/Desktop ~/svn ~/svn/trunk/code/sites/aweber_app ~/svn/trunk/code/awlib)
 
 # Adjust for root:
@@ -76,14 +82,6 @@ typeset -gU path cdpath manpath fpath
 if [ "`id -u`" -eq 0 ] || [[ "$SERVERTYPE" == critical ]]; then
     # 15 min timeout
    TMOUT=900
-fi
-
-# Disable the timeout on avatar. It just gets in the way.
-if [[ "$HOSTNAME" == avatar ]]; then
-    unset TMOUT
-    if [ $SUDO_USER ]; then
-        export SVN_SSH="ssh -o \"IdentitiesOnly yes\" -i $HOME/.ssh/svn-id_rsa -l $SUDO_USER"
-    fi
 fi
 
 # If we are in X then disable TMOUT
@@ -249,6 +247,22 @@ function _stew {
 }
 compctl -K _stew stew
 
+# Completion for vagrant
+function _vagrant {
+    VM=''
+    CMD="init"
+    VAGRANTFILE="$HOME/svn/vagrant/Vagrantfile"
+    if [ -f ./Vagrantfile ]; then
+        VAGRANTFILE="$(pwd)/Vagrantfile"
+    fi
+    if [ -f "$VAGRANTFILE" ]; then
+        VM=`grep config.vm.define "$VAGRANTFILE" | grep -v '^[ \t]*#' | awk '{print $2}' | tr -d '"' | sort | uniq | xargs`
+        CMD="box destroy halt help init package provision reload resume ssh ssh_config status suspend up version"
+    fi
+    eval "reply=($VM $CMD)"
+}
+compctl -K _vagrant vagrant
+
 # Make cd pushd too.
 setopt AUTO_CD
 setopt AUTO_PUSHD
@@ -292,98 +306,19 @@ function set_title() {
     esac
 }
 
-
 function precmd {
-    #local TERMWIDTH
-    #(( TERMWIDTH = ${COLUMNS} - 1))
-
-    ####
-    ## Truncate the path if it's too long.
-    #PR_FILLBAR=""
-    #PR_PWDLEN=""
-
-    #local promptsize=${#${(%):---(%n@%m:%l)---()--}}
-    #local pwdsize=${#${(%):-%~}}
-
-    #if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
-    #   ((PR_PWDLEN=$TERMWIDTH - $promptsize))
-    #else
-    #   PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${PR_HBAR}.)}"
-    #fi
     set_title
 }
 
 function preexec () {
-   echo $1 | grep ^sudo >> /dev/null
-
-   if [ $? -eq 0 ]; then
-      echo -ne '\e[0;31m'
-   fi
-}
-
-function setprompt () {
-   setopt prompt_subst
-
-   autoload colors zsh/terminfo
-   if [[ "$terminfo[colors]" -ge 8 ]]; then
-      colors
-   fi
-   for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
-      eval PR_$color='%{$terminfo[bold]$fg[${(L)color}]%}'
-      eval PR_LIGHT_$color='%{$fg[${(L)color}]%}'
-      (( count = $count + 1 ))
-   done
-   PR_NO_COLOUR="%{$terminfo[sgr0]%}"
-
-   local PR_RED=$'%{\e[0;31m%}'
-   local PR_GREEN=$'%{\e[1;32m%}'
-   local PR_PURPLE=$'%{\e[0;35m%}'
-   local PR_CYAN=$'%{\e[0;36m%}'
-   local PR_GRAY=$'%{\e[1;30m%}'
-   local PR_NORMAL=$'%{\e[0m%}'
-
-   ###
-   # See if we can use extended characters to look nicer.
-   typeset -A altchar
-   set -A altchar ${(s..)terminfo[acsc]}
-   PR_SET_CHARSET="%{$terminfo[enacs]%}"
-   PR_SHIFT_IN="%{$terminfo[smacs]%}"
-   PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
-   PR_HBAR=${altchar[q]:--}
-   PR_ULCORNER=${altchar[l]:--}
-   PR_LLCORNER=${altchar[m]:--}
-   PR_LRCORNER=${altchar[j]:--}
-   PR_URCORNER=${altchar[k]:--}
-
-   ###
-   # Decide if we need to set titlebar text.
-   case $TERM in
-      xterm*)
-      PR_TITLEBAR=$'%{\e]0;%(!.-=*[ROOT]*=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\a%}'
-      ;;
-   screen)
-      PR_TITLEBAR=$'%{\e_screen \005 (\005t) | %(!.-=[ROOT]=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\e\\%}'
-      ;;
-   *)
-      PR_TITLEBAR=''
-      ;;
-   esac
-
-   ###
-   # Finally, the prompt.
-   PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
-$PR_CYAN$PR_SHIFT_IN$PR_ULCORNER$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
-$PR_CYAN%(!.%SROOT%s.%n)$PR_GREEN@%m:%~\
-$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_HBAR${(e)PR_FILLBAR}$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
-$PR_MAGENTA%$PR_PWDLEN<...<%l%<<\
-$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_URCORNER$PR_SHIFT_OUT\
-
-$PR_CYAN$PR_SHIFT_IN$PR_LLCORNER$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
-%(?..$PR_LIGHT_RED%?$PR_BLUE:)\
-${(e)PR_APM}$PR_YELLOW%D{%H:%M}\
-$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_NO_COLOUR '
+    # Output sudo commands in red
+    if [[ "${1[0,4]}" = sudo ]]; then
+        echo -ne '\e[0;31m'
+    elif [[ "${1[0,3]}" = ack ]]; then
+        echo -ne '\e[0;35m'
+        printf "%$(tput cols)s\n"|tr ' ' '_'
+        echo -ne '\e[0m'
+    fi
 }
 
 function define_colors() {
@@ -400,57 +335,19 @@ function define_colors() {
    GRAY=$'%{\e[1;30m%}'
    NORMAL=$'%{\e[0m%}'
    INVERT=$'%{\e[7m%}'
-   #RED=$'%{\e[0;31;44m%}'
-   #RED_BOLD=$'%{\e[1;31;44m%}'
-   #YELLOW=$'%{\e[0;33;44m%}'
-   #YELLOW_BOLD=$'%{\e[1;33;44m%}'
-   #GREEN=$'%{\e[0;32;44m%}'
-   #GREEN_BOLD=$'%{\e[1;32;44m%}'
-   #PURPLE=$'%{\e[0;35;44m%}'
-   #CYAN=$'%{\e[0;36;44m%}'
-   #CYAN_BOLD=$'%{\e[1;36;44m%}'
-   #GRAY=$'%{\e[1;30;44m%}'
-   #NORMAL=$'%{\e[0;44m%}'
-   #INVERT=$'%{\e[7m%}'
 }
-
-# Define prompt.
-function set_prompt() {
-   local current_tty=`tty | sed -e "s/\/dev\/\(.*\)/\1/"`
-   local name=""
-   local host=""
-
-   if [ "$USER" != jimf ]; then
-      name="$C3%n"
-   fi
-
-   if [ "$SSH_TTY" ] || [[ "`tty`" = /dev/pts/* ]]; then
-      host="$C5%m$C6: "
-   fi
-
-   if [ -n "$name" ] && [ -n "$host" ]; then
-      host="$C4@$host"
-   fi
-
-   PS1="$C1%D{%H:%M} $C2($name$host$C7%3~$C8)$C9%(!.#.$)$NORMAL "
-}
-
-#setprompt
 
 # Source aliases.
 if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
-bgdark
+if [ -f "$HOME/.oh-my-zsh/themes/jimf.zsh-theme" ]; then
+    source "$HOME/.oh-my-zsh/themes/jimf.zsh-theme"
+fi
+
 set_title
 
-#if [ -n "$SSH_TTY" ] && [ -z "$SCREEN_EXIST" ]; then
-#   if which screen > /dev/null; then
-#      export SCREEN_EXIST=1
-#      screen -DR && exit
-#   fi
-#fi
 # According to http://nicolas.barcet.com/drupal/screen-by-default, -xRR is better
 if [ -n "$SSH_TTY" ]; then
     if [[ "$TERM" != screen* ]]; then

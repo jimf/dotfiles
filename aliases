@@ -3,29 +3,21 @@ alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
 
-## Navigation ##
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-
 ## Improved output ##
 alias df='df -h'
 alias diff='colordiff'
 alias dirsize='du -hs'
 alias du='du -h'
-alias egrep='egrep --color'
 alias free='free -m'
 alias grep='grep --color'
+alias egrep='egrep --color'
 alias zrep='zgrep --color'
-alias rsync='rsync -h'
 alias pgrep='pgrep -l'
+alias rsync='rsync -h'
 
 ## Convenience ##
 alias ack='ack --text'
-alias chterm='sudo update-alternatives --config x-terminal-emulator'
-alias cmdphp='/usr/local/apache2/bin/php'
 alias cpan='sudo perl -MCPAN -e shell'
-alias cputemp='cat /proc/acpi/thermal_zone/THM*/temperature'
 alias h="history -1 | sed 's/^\s*[0-9]\+\s*//'"
 alias l.='ls -dF .[a-zA-Z0-9]*'
 alias la='ls -a'
@@ -34,18 +26,15 @@ alias ld='ls -d */'
 alias lf.='ls .*(.)'
 alias lf='ls *(.)'
 alias ll='ls -lh'
-alias lsvms='vmls'
 alias lt='ls -t1'
 alias mkdir='mkdir -p'
 alias nt='python setup.py -q nosetests'
+alias pd='python setup.py develop'
 alias pg='ps ax | grep'
 alias psg='ps ax | grep'
 alias realpath='readlink -f'
 alias s='sudo -s'
-alias sup='svn up ~/svn/{packages,trunk,system,database,api}'
 alias taggable="svn diff -r \$(svn log ../tags/\$(ls ../tags | sort -n -t . -k 1,1 -k 2,2 -k 3,3 | tail -n1) --stop-on-copy -q | grep ^r | awk '{print \$1}' | sed 's/r//'):HEAD --summarize"
-alias trickle='trickle -d 30'
-alias vmls='ssh nebula "ls /storage/vms/*avatar* | sort -r"'
 alias xx='exit'
 alias xxs='touch /tmp/stayloggedin && exit'
 
@@ -55,7 +44,6 @@ alias psmem="ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS"
 
 ## Utility ##
 alias ping='ping -c 3'
-#alias ssh='ssh -Y' # removed as it interferes with ssh hostname completion
 alias unbz2='tar xjf'
 alias untgz='tar xzf'
 alias wget='wget -c'
@@ -70,13 +58,6 @@ alias :q='exit'
 alias snv='svn'
 alias sqpl='sqlp'
 
-## Logs ##
-alias addleadlog='ssh log1 tail -f /storage/logs/addlead.pl.log'
-alias apachelog='ssh log1 tail -f /storage/logs/access_log_aweber'
-alias bclog='ssh mail4 tail -f /home/aweber/logs/broadcast_parent.`date +"%F"`.log'
-alias devapachelog='ssh log1 tail -f /storage/logs/access_logs_awebertest'
-alias phplog='ssh log1 tail -f /storage/logs/php_error_log'
-alias pglog='ssh log1 sudo tail -f /data1/pgsql/data/pg_log/postgresql-`date +"%d"`.log'
 
 ## Functions ##
 
@@ -86,58 +67,42 @@ add (){
    then
       cat "$1" | awk '{sum += $1} END {print sum}'
    else
-      (while read line; do echo $line; done) | awk '{sum += $1} END {print sum}'
+      (while read line; do echo $line | tr ' ' "\n"; done) | awk '{sum += $1} END {print sum}'
    fi
 }
 
-# Define prompt colors for a dark background.
-alias darkgb=bgdark
-function bgdark() {
-   define_colors
-
-   C1="$YELLOW_BOLD"
-   C2="$GRAY"
-   C3="$PURPLE_BOLD"
-   C4="$PURPLE_BOLD"
-   C5="$C3"
-   C6="$NORMAL"
-   C7="$GREEN_BOLD"
-   C8="$C2"
-   C9="$NORMAL"
-
-   if [ "`id -u`" -eq 0 ]; then
-      C3="$RED_BOLD"
-      C9="$RED_BOLD"
-   fi
-
-   if [[ "$SERVERTYPE" == critical ]]; then
-      C5="$RED_BOLD"
-   fi
-
-   set_prompt
+# Human readable mtime of file(s).
+lmod () {
+    if test -n "$1"; then
+        if [ ! -f "$1" ]; then
+            echo "Argument must be a file!"
+            exit 1
+        fi
+        td $(( `date '+%s'` - `stat -f '%m' "$1"` )) | sed "s#^#$1    modified #" | sed 's/$/ ago/'
+    else
+        lines=$(while read line; do echo "$line"; done)
+        longest=$(echo $lines | awk '{print length(), $0 | "sort -nr"}' | head | awk '{print $1}' | head -n1)
+        for line in $(echo $lines | xargs); do
+            lmod "$line" | awk "{printf \"%-${longest}s    %s\n\", \$1,\$2}" FS='    '
+        done
+    fi
 }
 
-# Define prompt colors for a light background.
-alias lightbg=bglight
-function bglight() {
-   define_colors
+# Colorize tail output for log monitoring.
+function ctail() {
+    /usr/bin/tail "$@" | colorlogging
+}
 
-   C1="$YELLOW"
-   C2="$NORMAL"
-   C3="$CYAN"
-   C4="$CYAN_BOLD"
-   C5="$C3"
-   C6="$NORMAL"
-   C7="$GREEN"
-   C8="$C2"
-   C9="$NORMAL"
+function tail() {
+    if [[ "$@" = *log* ]]; then
+        ctail "$@"
+    else
+        /usr/bin/tail "$@"
+    fi
+}
 
-   if [ "`id -u`" -eq 0 ]; then
-      C3="$RED"
-      C9="$RED"
-   fi
-
-   set_prompt
+function colorlogging() {
+    perl -pe 'sub c {%c=("ERROR",31,"INFO",32,"DEBUG",36,"WARNING",33,"CRITICAL",35);"\e[1;".$c{@_[0]}."m".@_[1]}s/.*\b(ERROR|WARNING|CRITICAL|DEBUG|INFO)\b.*/c($1,$&)/ge;'
 }
 
 # Run cake testcase.
@@ -148,15 +113,6 @@ function caketestcase () {
 # Run cake testgroup.
 function caketestgroup () {
     php -q /home/sites/cake_core/1.2b/cake/console/cake.php -app /home/sites/$1 testsuite app group $2
-}
-
-# Automatically do an ls after each cd.
-cd() {
-    if [ -n "$1" ]; then
-        builtin cd "$@" && ls
-    else
-        builtin cd ~ && ls
-    fi
 }
 
 # Copy and go to dir.
@@ -193,34 +149,40 @@ function decruft () {
     rm -rf **/*.egg-info
 }
 
-# Uncompress a file. Also see package unp.
-unpack () {
-   if [ ! -n "$1" ]; then
-      echo "usage: $0 filename.<7z|Z|bz2|gz|lzma|rar|tar|tar.bz2|tar.gz|tbz2|tgz|zip>"
-      return
-   fi
-
-   if [ -f "$1" ]; then
-      case $1 in
-         *.7z)        7z x $1 ;;
-         *.Z)         uncompress $1 ;;
-         *.bz2)       bunzip2 $1 ;;
-         *.gz)        gunzip $1 ;;
-         *.lzma)      unlzma -cd $1 | tar -xf- ;;
-         *.rar)       rar x $1 ;;
-         *.tar.bz2)   tar xjf $1 ;;
-         *.tar.gz)    tar xzf $1 && tar xf ${1%.gz} ;;
-         *.tar)       tar xf $1 ;;
-         *.tbz2)      tar xjf $1 ;;
-         *.tgz)       tar xzf $1 ;;
-         *.zip)       unzip $1 ;;
-         *)           echo "'$1' cannot be extracted via unpack()" ;;
-      esac
-   else
-      #*.lzma)      unlzma $1 && tar xf ${1%.lzma} ;;
-      echo "'$1' is not a valid file"
-   fi
+# iTerm2 growl notifications
+function growl () {
+    echo -e $'\e]9;'${1}'\007'
 }
+
+# Uncompress a file. Also see package unp.
+#unpack () {
+#   if [ ! -n "$1" ]; then
+#      echo "usage: $0 filename.<7z|Z|bz2|gz|lzma|rar|tar|tar.bz2|tar.gz|tbz2|tgz|zip>"
+#      return
+#   fi
+#
+#   if [ -f "$1" ]; then
+#      case $1 in
+#         *.7z)        7z x $1 ;;
+#         *.Z)         uncompress $1 ;;
+#         *.lzma)      unlzma -cd $1 | tar -xf- ;;
+#         *.rar)       rar x $1 ;;
+#         *.tar.bz2)   tar xjf $1 ;;
+#         *.tar.gz)    tar xzf $1 && tar xf ${1%.gz} ;;
+#         *.bz2)       bunzip2 $1 ;;
+#         *.gz)        gunzip $1 ;;
+#         *.tar)       tar xf $1 ;;
+#         *.tbz2)      tar xjf $1 ;;
+#         *.tgz)       tar xzf $1 ;;
+#         *.zip)       unzip $1 ;;
+#         *)           echo "'$1' cannot be extracted via unpack()" ;;
+#      esac
+#   else
+#      #*.lzma)      unlzma $1 && tar xf ${1%.lzma} ;;
+#      echo "'$1' is not a valid file"
+#   fi
+#}
+alias unpack='extract'
 
 # Echo a specific line of a file.
 line (){
@@ -232,6 +194,11 @@ line (){
    fi
 }
 
+# Case-insensitive ls
+ils () {
+    find . -maxdepth 1 -iname "$1" | sed 's#\./##' | xargs ls
+}
+
 # Compare directory listings.
 lscmp (){
    comm <(ls "$1") <(ls "$2")
@@ -240,12 +207,13 @@ lscmp (){
 function lookup_pkg () {
     pkg="$1"
     echo -n "==[$pkg]";printf "%$((59 - $((${#pkg} + 4))))s\n"|tr ' ' '='
-    echo "Production"
-    lynx -dump -listonly http://repo/ubuntu-custom/hardy-aw/packages/ | grep "$1_" | sed 's/.*_\(.*\)_.*/\1/' | sed 's/^/  /'
-    echo "\nDevel"
-    lynx -dump -listonly http://repo/ubuntu-custom/hardy-aw-dev/packages/ | grep "$1_" | sed 's/.*_\(.*\)_.*/\1/' | sed 's/^/  /'
+    pkg_status $pkg
     echo
     echo
+}
+
+function pkg_status (){
+    (for repo in lucid hardy; do lynx -dump -listonly http://repo/ubuntu-custom/$repo-aw/packages/ | grep "$1_" | sed 's/.*_\(.*\)_.*/\1/' | sed "s/$/ $repo/"; lynx -dump -listonly http://repo/ubuntu-custom/$repo-aw-dev/packages/ | grep --color "$1_" | sed 's/.*_\(.*\)_.*/\1/' | sed "s/$/ $repo development/"; done) | sort -t . -k 1,1n -k 2,2n -k 3,3n | awk '{ a[NR]=$0 } END { for(i=NR; i; --i) print a[i] } ' | column -t
 }
 
 function rdeps () {
@@ -271,41 +239,11 @@ mvg (){
   fi
 }
 
-pkg () {
-    if [ -d /opt/packages ]; then
-        PKGDIR=/opt/packages
-    elif [ -d ~/svn/packages ]; then
-        PKGDIR=~/svn/packages
-    else
-        echo "Package directory unknown"
-        return
-    fi
-
-    if [ -n "$1" ]; then
-        for dir in "$PKGDIR/$1/trunk" "$PKGDIR/$1"; do
-            if [ -d "$dir" ]; then
-                echo "Found package $PKGDIR/$1"
-                echo
-                builtin cd "$dir"
-                ls
-                return
-            fi
-        done
-        for pkg in `find -L "$PKGDIR" -maxdepth 1 -type d -name "*$1*" -print`; do
-            echo "Found package $pkg"
-            echo
-            if [ -d "$pkg/trunk" ]; then
-                builtin cd "$pkg/trunk"
-            else
-                builtin cd "$pkg"
-            fi
-            ls
-            return
-        done
-        echo "Package not found: $1"
-    else
-        builtin cd $PKGDIR
-        ls
+function pkg () {
+    package=$($HOME/bin/pkg "$1")
+    if [ -n "$package" ]; then
+        cd "$package"
+        unset package
     fi
 }
 
@@ -319,6 +257,20 @@ pskill () {
     done
 }
 
+# Wrap pwd to take a file argument
+pwd () {
+    if [ -f "$1" ]; then
+        `readlink --version &> /dev/null` && READLINKVER=gnu || READLINKVER=bsd
+        if [[ "$READLINKVER" = gnu ]]; then
+            readlink -f "$1"
+        else
+            readlink "$1"
+        fi
+    else
+        builtin pwd
+    fi
+}
+
 # Search for various types of README files in dir and display them in $PAGER.
 readme () {
    local files
@@ -329,6 +281,22 @@ readme () {
    else
       print 'No README files.'
    fi
+}
+
+# Search/replace directory inline.
+function replaceall () {
+    FIND="$1"
+    REPLACE="$2"
+    FILECOUNT=$(find . -type f -not -iwholename '*.svn*' -print | wc -l)
+    OCCURENCES=$(find . -type f -not -iwholename '*.svn*' -print0 | xargs -0 cat | grep -o "$FIND" | wc -l)
+    if [ "$OCCURENCES" -gt 0 ]; then
+        ack -l "$FIND" | xargs sed -i "" -e "s/$FIND/$REPLACE/g"
+        [ "$OCCURENCES" -eq 1 ] && S1="" || S1="s"
+        [ "$FILECOUNT" -eq 1 ] && S2="" || S2="s"
+        echo "Replaced ${OCCURENCES//[[:space:]]} occurence$S1 of \"$FIND\" with \"$REPLACE\" amongst ${FILECOUNT//[[:space:]]} file$S2."
+    else
+        echo "Nothing to replace"
+    fi
 }
 
 # Recursive grep that ignores svn directories/files.
@@ -357,12 +325,12 @@ vi () {
     VIM=`builtin which vim`
     if [ -f "$@" ]; then
         if [ -w "$@" ]; then
-            $VIM "$@"
+            $VIM $@
         else
-            sudo $VIM "$@"
+            sudo $VIM $@
         fi
     else
-        $VIM "$@"
+        $VIM $@
     fi
 }
 
@@ -375,5 +343,32 @@ which () {
             echo
             cat $WHICH
         fi
+    fi
+}
+
+# Strip ANSI formatting from text
+function noansi () {
+    perl -pe "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"
+}
+
+# Convert epoch timestamp to human readable format
+function epoch2date() {
+    `date --version &> /dev/null` && DATEVER=gnu || DATEVER=bsd
+    if test -n "$1"
+    then
+        if [[ "$DATEVER" = bsd ]]; then
+            date -r "$1"
+        else
+            date -d "1970-01-01 $1 sec GMT"
+        fi
+    else
+        while read line
+        do
+            if [[ "$DATEVER" = bsd ]]; then
+                date -r "$line"
+            else
+                date -d "1970-01-01 $line sec GMT"
+            fi
+        done
     fi
 }
