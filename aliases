@@ -323,8 +323,8 @@ function svngrep () {
 # Automatically use sudo for non-writable files.
 vi () {
     VIM=`builtin which vim`
-    if [ -f "$@" ]; then
-        if [ -w "$@" ]; then
+    if [ -f "$1" ]; then
+        if [ -w "$1" ]; then
             $VIM $@
         else
             sudo $VIM $@
@@ -336,12 +336,14 @@ vi () {
 
 # Also cat the file if it's in ~/bin and is short
 which () {
-    builtin which "$@"
-    WHICH=`builtin which "$@" | head -n1`
-    if echo $WHICH | egrep -q 'jimf/bin'; then
-        if [ "`wc -l $WHICH | awk '{print $1}'`" -le 30 ]; then
-            echo
-            cat $WHICH
+    builtin which $@
+    if [ -t 1 ]; then
+        WHICH=`builtin which "$@" | head -n1`
+        if echo $WHICH | egrep -q 'jimf/bin'; then
+            if [ "`wc -l $WHICH | awk '{print $1}'`" -le 30 ]; then
+                echo
+                cat $WHICH
+            fi
         fi
     fi
 }
