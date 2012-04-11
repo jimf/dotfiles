@@ -1,0 +1,67 @@
+[user]
+	name = Jim Fitzpatrick
+	email = fitzpatrick.jim@gmail.com
+[color]
+	ui = auto
+[alias]
+	a = add
+	aa = add --all
+	ae = add --edit
+	ai = add --interactive
+	amend = commit --amend -C HEAD
+	ap = add --patch
+	au = add --update
+	authors = "!git log --pretty=format:%aN | sort | uniq -c | sort -rn"
+	b = branch
+	ca = commit --amend
+	ci = commit
+	changes = diff --name-status -r
+	cm = commit --message
+	co = checkout
+	cpc = cherry-pick
+	d = diff
+	dc = diff --cached
+	div = divergence
+	ds = diff --staged
+	h = help
+	irb = rebase --interactive
+	l = log --abbrev-commit --date=relative --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
+	lg = log --graph --pretty=format:'%Cred%h%Creset %an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+	ls-ignored = ls-files --exclude-standard --ignored --others
+	m = merge
+	mm = merge --no-ff
+	msg = commit --allow-empty -m
+	p = cherry-pick -s
+	pick = cherry-pick
+	prune-remotes = "!for remote in `git remote`; do git remote prune $remote; done"
+	r = remote
+	ra = !git log --graph --abbrev-commit --date=relative -20 --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
+	rb = rebase
+	rba = rebase --abort
+	rbc = rebase --continue
+	rbs = rebase --skip
+	rh = reset --hard
+	rmb = !sh -c 'git branch -D $1 && git push origin :$1' -
+	ru = remote update --prune
+	s = status --short --branch
+	sl = shortlog
+	sm = submodule
+	sma = submodule add
+	smu = submodule update --init
+	st = status
+	undo = reset --soft HEAD^
+	wd = diff --color-words
+	wds = diff --color-words --staged
+	push = push --tags
+[core]
+	excludesfile = ~/.cvsignore
+	whitespace = trailing-space,space-before-tab
+[github]
+	host = github.colo.lair
+[diff]
+	mnemonicprefix = true
+	tool = vimdiff
+[difftool]
+	prompt = false
+[merge]
+	tool = gvimdiff
