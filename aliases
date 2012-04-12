@@ -14,6 +14,7 @@ alias egrep='egrep --color'
 alias zrep='zgrep --color'
 alias pgrep='pgrep -l'
 alias rsync='rsync -h'
+alias tree='tree -CF'
 
 ## Convenience ##
 alias ack='ack --text'
