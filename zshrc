@@ -107,6 +107,7 @@ function preexec () {
     # Output sudo commands in red
     if [[ "${1[0,4]}" = sudo ]]; then
         echo -ne '\e[0;31m'
+    # Prepend ack with a purple bar
     elif [[ "${1[0,3]}" = ack ]]; then
         echo -ne '\e[0;35m'
         printf "%$(tput cols)s\n"|tr ' ' '─'
@@ -117,11 +118,6 @@ function preexec () {
 function chpwd () {
     ls
 }
-
-# Source aliases.
-if [ -f ~/.aliases ]; then
-    . ~/.aliases
-fi
 
 # According to http://nicolas.barcet.com/drupal/screen-by-default, -xRR is better
 if [ -n "$SSH_TTY" ]; then
