@@ -60,7 +60,6 @@ typeset -gU path cdpath manpath fpath
 (( ${+PAGER} )) || export PAGER=`whence most || whence less`
 (( ${+LESSOPEN} )) || export LESSOPEN='|lesspipe.sh %s'
 (( ${+CC} )) || export CC='gcc'
-(( ${+TERM} )) || export TERM='xterm-256color'
 #(( ${+SVN_EDITOR} )) || export SVN_EDITOR='vim -f --noplugin'
 (( ${+SVN_EDITOR} )) || export SVN_EDITOR=`which vim`
 (( ${+GIT_EDITOR} )) || export GIT_EDITOR=`which vim`
@@ -71,6 +70,7 @@ typeset -gU path cdpath manpath fpath
 (( ${+PGDATABASE} )) || export PGDATABASE=app
 (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
 export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+export TERM='xterm-256color'
 case "$HOSTNAME" in
     dev*)
         export SERVERTYPE='dev'
