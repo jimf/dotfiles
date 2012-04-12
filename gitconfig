@@ -18,6 +18,7 @@
 	changes = diff --name-status -r
 	cm = commit --message
 	co = checkout
+	com = checkout master
 	cpc = cherry-pick
 	d = diff
 	dc = diff --cached
@@ -29,7 +30,7 @@
 	lg = log --graph --pretty=format:'%Cred%h%Creset %an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 	ls-ignored = ls-files --exclude-standard --ignored --others
 	m = merge
-	mm = merge --no-ff
+	mm = merge --no-commit --no-ff @{-1}
 	msg = commit --allow-empty -m
 	p = cherry-pick -s
 	pick = cherry-pick
@@ -40,6 +41,7 @@
 	rba = rebase --abort
 	rbc = rebase --continue
 	rbs = rebase --skip
+	rbm = rebase master
 	rh = reset --hard
 	rmb = !sh -c 'git branch -D $1 && git push origin :$1' -
 	ru = remote update --prune
@@ -49,6 +51,7 @@
 	sma = submodule add
 	smu = submodule update --init
 	st = status
+	tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | xargs git branch -d
 	undo = reset --soft HEAD^
 	wd = diff --color-words
 	wds = diff --color-words --staged
