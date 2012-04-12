@@ -99,10 +99,6 @@ setopt NO_beep
 # COMPLETION:                                                                 #
 ###############################################################################
 
-# Complete packages.
-[ -d ~/svn/packages ] && compctl -g "~/svn/packages/*/(:t)" pkg
-[ -d /opt/packages ] && compctl -g "/opt/packages/*/(:t)" pkg
-
 function preexec () {
     # Output sudo commands in red
     if [[ "${1[0,4]}" = sudo ]]; then
