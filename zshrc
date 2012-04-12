@@ -103,23 +103,6 @@ setopt NO_beep
 [ -d ~/svn/packages ] && compctl -g "~/svn/packages/*/(:t)" pkg
 [ -d /opt/packages ] && compctl -g "/opt/packages/*/(:t)" pkg
 
-# Completion for vagrant
-#function _vagrant {
-#    VM=''
-#    CMD="init"
-#    VAGRANTFILE="$HOME/svn/vagrant/Vagrantfile"
-#    if [ -f ./Vagrantfile ]; then
-#        VAGRANTFILE="$(pwd)/Vagrantfile"
-#    fi
-#    if [ -f "$VAGRANTFILE" ]; then
-#        VM=`grep config.vm.define "$VAGRANTFILE" | grep -v '^[ \t]*#' | awk '{print $2}' | tr -d '"' | sort | uniq | xargs`
-#        CMD="box destroy halt help init package provision reload resume ssh ssh_config status suspend up version"
-#    fi
-#    eval "reply=($VM $CMD)"
-#}
-#compctl -K _vagrant vagrant
-
-
 function preexec () {
     # Output sudo commands in red
     if [[ "${1[0,4]}" = sudo ]]; then
