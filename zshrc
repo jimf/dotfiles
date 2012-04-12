@@ -86,21 +86,6 @@ case $TERM in
 esac
 
 
-###############################################################################
-# ADJUST ENVIRONMENT:                                                         #
-###############################################################################
-setopt extended_glob
-watch=(notme)
-
-
-###############################################################################
-# COMPLETION:                                                                 #
-###############################################################################
-
-function chpwd () {
-    ls
-}
-
 # According to http://nicolas.barcet.com/drupal/screen-by-default, -xRR is better
 if [ -n "$SSH_TTY" ]; then
     if [[ "$TERM" != screen* ]]; then
