@@ -29,9 +29,13 @@ DISABLE_AUTO_UPDATE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(extract git vagrant)
+if builtin which -s git &>/dev/null; then
+    plugins=(extract git vagrant)
+else
+    plugins=(extract vagrant)
+fi
 
-source $ZSH/oh-my-zsh.sh
+source $ZSH/oh-my-zsh.sh &>/dev/null
 
 # Customize to your needs...
 ###############################################################################
@@ -69,8 +73,8 @@ typeset -gU path cdpath manpath fpath
 (( ${+PGPORT} )) || export PGPORT=6000
 (( ${+PGDATABASE} )) || export PGDATABASE=app
 (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
+(( ${+TERM} )) || export TERM='xterm-256color'
 export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
-export TERM='xterm-256color'
 case "$HOSTNAME" in
     dev*)
         export SERVERTYPE='dev'
