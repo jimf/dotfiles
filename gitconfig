@@ -18,6 +18,7 @@
 	changes = diff --name-status -r
 	cm = commit --message
 	co = checkout
+	cob = checkout -b
 	com = checkout master
 	cpc = cherry-pick
 	d = diff
@@ -30,9 +31,11 @@
 	lg = log --graph --pretty=format:'%Cred%h%Creset %an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 	ls-ignored = ls-files --exclude-standard --ignored --others
 	m = merge
-	mm = merge --no-commit --no-ff @{-1}
+	mb = merge --no-commit --no-ff @{-1}
+	mm = merge master
 	msg = commit --allow-empty -m
 	p = cherry-pick -s
+	pom = push origin master
 	pick = cherry-pick
 	prune-remotes = "!for remote in `git remote`; do git remote prune $remote; done"
 	r = remote
