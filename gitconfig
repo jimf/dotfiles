@@ -23,6 +23,7 @@
 	cpc = cherry-pick
 	d = diff
 	dc = diff --cached
+	done = "!git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3`; gh"
 	div = divergence
 	ds = diff --staged
 	h = help
