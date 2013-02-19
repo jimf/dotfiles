@@ -42,10 +42,14 @@ path=(~/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
-cdpath=(. ~ ~/Desktop ~/svn ~/svn/trunk/code/sites/aweber_app ~/svn/trunk/code/awlib)
+cdpath=(. ~ ~/Desktop ~/svn/trunk/code/sites/aweber_app ~/svn/trunk/code/awlib)
 manpath=(/usr/local/man /usr/share/man)
 manpath=($manpath /usr/man)
 [ -d ~/.zfunc ] && fpath=(~/.zfunc $fpath)
+export FPATH="$FPATH:/opt/local/share/zsh/site-functions/"
+if [ -f /opt/local/etc/profile.d/autojump.sh ]; then
+    source /opt/local/etc/profile.d/autojump.sh
+fi
 
 typeset -gU path cdpath manpath fpath
 
@@ -70,7 +74,11 @@ typeset -gU path cdpath manpath fpath
 (( ${+PGPORT} )) || export PGPORT=6000
 (( ${+PGDATABASE} )) || export PGDATABASE=app
 (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
-(( ${+TERM} )) || export TERM='xterm-256color'
+
+if [ -e /usr/share/terminfo/78/xterm-256color ] || [ -e /usr/share/terminfo/x/xterm-256color ]; then
+    [ -n "$SSH_TTY" ] || export TERM=xterm-256color
+fi
+
 export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 case "$HOSTNAME" in
     dev*)

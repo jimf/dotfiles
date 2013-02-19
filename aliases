@@ -14,11 +14,14 @@ alias egrep='egrep --color'
 alias zrep='zgrep --color'
 alias pgrep='pgrep -l'
 alias rsync='rsync -h'
+alias ssh='TERM=xterm ssh'
 alias tree='tree -CF'
 
 ## Convenience ##
 alias ack='ack --text'
 alias cpan='sudo perl -MCPAN -e shell'
+#alias currtag='svn ls svn+ssh://scm/aweber/branches/rel | sort -n -t . -k 1,1 -k 2,2 | tr -d / | tail -n1'
+alias gist='open "http://github-enterprise.colo.lair/gist"'
 alias h="history -1 | sed 's/^\s*[0-9]\+\s*//'"
 alias l.='ls -dF .[a-zA-Z0-9]*'
 alias la='ls -a'
@@ -91,14 +94,14 @@ lmod () {
 
 # Colorize tail output for log monitoring.
 function ctail() {
-    /usr/bin/tail "$@" | colorlogging
+    /usr/bin/tail $@ | colorlogging
 }
 
 function tail() {
     if [[ "$@" = *log* ]]; then
-        ctail "$@"
+        ctail $@
     else
-        /usr/bin/tail "$@"
+        /usr/bin/tail $@
     fi
 }
 
@@ -272,6 +275,11 @@ pwd () {
     fi
 }
 
+# Get version of python package
+pyver () {
+    python -c "import pkg_resources; print pkg_resources.get_distribution('$1')"
+}
+
 # Search for various types of README files in dir and display them in $PAGER.
 readme () {
    local files
@@ -319,6 +327,11 @@ function svngrep () {
    fi
 
    find "$LOC" -path '*/.svn' -prune -o -type f -print | xargs grep --color "$@"
+}
+
+# Reverse lines
+tac () {
+    awk '1 { last = NR; line[last] = $0; } END { for (i = last; i > 0; i--) { print line[i]; } }'
 }
 
 # Automatically use sudo for non-writable files.

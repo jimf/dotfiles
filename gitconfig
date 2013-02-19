@@ -12,7 +12,7 @@
 	ap = add --patch
 	au = add --update
 	authors = "!git log --pretty=format:%aN | sort | uniq -c | sort -rn"
-	b = branch
+	br = branch
 	ca = commit --amend
 	ci = commit
 	changes = diff --name-status -r
@@ -23,7 +23,7 @@
 	cpc = cherry-pick
 	d = diff
 	dc = diff --cached
-	done = "!git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3`; gh"
+	done = "!git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3`; sleep 1; gh"
 	div = divergence
 	ds = diff --staged
 	h = help
@@ -31,6 +31,7 @@
 	l = log --abbrev-commit --date=relative --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
 	lg = log --graph --pretty=format:'%Cred%h%Creset %an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 	ls-ignored = ls-files --exclude-standard --ignored --others
+	ls-untracked = ls-files --other --exclude-standard
 	m = merge
 	mb = merge --no-commit --no-ff @{-1}
 	mm = merge master
@@ -46,6 +47,7 @@
 	rbc = rebase --continue
 	rbs = rebase --skip
 	rbm = rebase master
+	repush = "!git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3`"
 	rh = reset --hard
 	rmb = !sh -c 'git branch -D $1 && git push origin :$1' -
 	ru = remote update --prune
@@ -57,9 +59,12 @@
 	st = status
 	tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | xargs git branch -d
 	undo = reset --soft HEAD^
+	unstage = reset HEAD --
 	wd = diff --color-words
 	wds = diff --color-words --staged
+	wip = "!git checkout -b `git symbolic-ref -q HEAD | cut -d'/' -f 3`-wip; git add -A; git commit -a -m wip; git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3` -f; gh"
 	push = push --tags
+	showtrackedignored = ls-files -i --exclude-standard
 [core]
 	excludesfile = ~/.cvsignore
 	whitespace = trailing-space,space-before-tab
@@ -72,3 +77,6 @@
 	prompt = false
 [merge]
 	tool = gvimdiff
+[hub]
+	host = github-enterprise.colo.lair
+	protocol = http
