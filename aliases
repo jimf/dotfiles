@@ -32,11 +32,13 @@ alias lf='ls *(.)'
 alias ll='ls -lh'
 alias lt='ls -t1'
 alias mkdir='mkdir -p'
+alias npmoutdated="npm -s outdated | egrep -v '>'"
 alias nt='python setup.py -q nosetests'
 alias pd='python setup.py develop'
 alias pg='ps ax | grep'
 alias psg='ps ax | grep'
-alias realpath='readlink -f'
+alias realpath="python -c 'import os, sys; print os.path.realpath(sys.argv[1])'"
+#alias realpath='readlink -f'
 alias s='sudo -s'
 alias taggable="svn diff -r \$(svn log ../tags/\$(ls ../tags | sort -n -t . -k 1,1 -k 2,2 -k 3,3 | tail -n1) --stop-on-copy -q | grep ^r | awk '{print \$1}' | sed 's/r//'):HEAD --summarize"
 alias xx='exit'
@@ -47,6 +49,7 @@ alias pscpu="ps -e -o pcpu,cpu,nice,state,cputime,args --sort -pcpu | sed '/^ 0.
 alias psmem="ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS"
 
 ## Utility ##
+alias dateR="python -c 'from email.Utils import formatdate; print formatdate(localtime=True)'"
 alias ping='ping -c 3'
 alias unbz2='tar xjf'
 alias untgz='tar xzf'
@@ -73,6 +76,22 @@ add (){
    else
       (while read line; do echo $line | tr ' ' "\n"; done) | awk '{sum += $1} END {print sum}'
    fi
+}
+
+avg () {
+    if test -n "$1"; then
+        cat "$1" | awk '{total+=$1} END {print total/NR}'
+    else
+      (while read line; do echo $line | tr ' ' "\n"; done) | awk '{total+=$1} END {print total/NR}'
+    fi
+}
+
+stats () {
+    if test -n "$1"; then
+        cat "$1" | awk 'NR == 1 { max=$1; min=$1; sum=0; sumsq=0 } { if ($1>max) max=$1; if ($1<min) min=$1; sum+=$1; sumsq+=$1*$1} END {printf "Min: %f   Max: %f   Average: %f   Variance: %f   StdDev: %f\n", min, max, sum/NR, sumsq/NR - (sum/NR)**2, sqrt(sumsq/NR - (sum/NR)**2)}'
+    else
+      (while read line; do echo $line | tr ' ' "\n"; done) | awk 'NR == 1 { max=$1; min=$1; sum=0; sumsq=0 } { if ($1>max) max=$1; if ($1<min) min=$1; sum+=$1; sumsq+=$1*$1} END {printf "Min: %f   Max: %f   Average: %f   Variance: %f   StdDev: %f\n", min, max, sum/NR, sumsq/NR - (sum/NR)**2, sqrt(sumsq/NR - (sum/NR)**2)}'
+    fi
 }
 
 # Human readable mtime of file(s).
@@ -214,6 +233,10 @@ function lookup_pkg () {
     pkg_status $pkg
     echo
     echo
+}
+
+function paths () {
+    for d in $(echo $PATH | tr ':' '\n'); do [ -e "$d/$1" ] && echo "$d/$1"; done
 }
 
 function pkg_status (){
@@ -387,4 +410,12 @@ function epoch2date() {
             fi
         done
     fi
+}
+
+function green() {
+    echo -e "\e[1;32m$*\e[1;00m"
+}
+
+function red() {
+    echo -e "\e[0;31m$*\e[1;00m"
 }

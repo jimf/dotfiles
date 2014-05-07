@@ -179,3 +179,5 @@ bgdark
 if [ -n "$SSH_TTY" ] && [[ "$TERM" != screen* ]]; then
    screen -xRR && exit
 fi
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting

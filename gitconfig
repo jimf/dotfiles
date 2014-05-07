@@ -13,8 +13,10 @@
 	au = add --update
 	authors = "!git log --pretty=format:%aN | sort | uniq -c | sort -rn"
 	br = branch
+	branchname = symbolic-ref --short HEAD
 	ca = commit --amend
 	ci = commit
+	cis = commit -m '' --signoff
 	changes = diff --name-status -r
 	cm = commit --message
 	co = checkout
@@ -23,12 +25,13 @@
 	cpc = cherry-pick
 	d = diff
 	dc = diff --cached
-	done = "!git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3`; sleep 1; gh"
+	done = "!git push origin `git branchname`; sleep 1; git browse newpull"
 	div = divergence
 	ds = diff --staged
 	h = help
 	irb = rebase --interactive
 	l = log --abbrev-commit --date=relative --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
+	lasttag = describe --tags --abbrev=0
 	lg = log --graph --pretty=format:'%Cred%h%Creset %an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 	ls-ignored = ls-files --exclude-standard --ignored --others
 	ls-untracked = ls-files --other --exclude-standard
@@ -47,7 +50,7 @@
 	rbc = rebase --continue
 	rbs = rebase --skip
 	rbm = rebase master
-	repush = "!git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3`"
+	repush = "!git push origin `git branchname`"
 	rh = reset --hard
 	rmb = !sh -c 'git branch -D $1 && git push origin :$1' -
 	ru = remote update --prune
@@ -57,12 +60,15 @@
 	sma = submodule add
 	smu = submodule update --init
 	st = status
-	tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | xargs git branch -d
+	tagchanges = "!git log `git lasttag`... --date=relative --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'"
+	tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | grep -v feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | grep -v feature | xargs git branch -d
+	tidy-dryrun = !git remote prune --dry-run origin && git branch -r --merged master | grep -v 'master$' | grep -v feature | sed 's%origin/%%' | xargs -I% echo [remote] % && git branch --merged master | grep -v 'master$' | grep -v feature | xargs -I% echo [local] %
 	undo = reset --soft HEAD^
 	unstage = reset HEAD --
+	unwip = "!git reset --soft HEAD^; git unstage; git checkout -"
 	wd = diff --color-words
 	wds = diff --color-words --staged
-	wip = "!git checkout -b `git symbolic-ref -q HEAD | cut -d'/' -f 3`-wip; git add -A; git commit -a -m wip; git push origin `git symbolic-ref -q HEAD | cut -d'/' -f 3` -f; gh"
+	wip = "!git checkout -b `git branchname`-wip; git add -A; git commit -a -m wip; git push origin `git branchname` -f; gh"
 	push = push --tags
 	showtrackedignored = ls-files -i --exclude-standard
 [core]
