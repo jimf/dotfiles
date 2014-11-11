@@ -86,3 +86,5 @@
 [hub]
 	host = github-enterprise.colo.lair
 	protocol = http
+[push]
+	default = simple

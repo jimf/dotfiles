@@ -125,7 +125,7 @@ function tail() {
 }
 
 function colorlogging() {
-    perl -pe 'sub c {%c=("ERROR",31,"INFO",32,"DEBUG",36,"WARNING",33,"CRITICAL",35);"\e[1;".$c{@_[0]}."m".@_[1]}s/.*\b(ERROR|WARNING|CRITICAL|DEBUG|INFO)\b.*/c($1,$&)/ge;'
+    perl -pe 'sub c {%c=("ERROR",31,"ERR",31,"INFO",32,"DEBUG",36,"WARNING",33,"CRITICAL",35);"\e[1;".$c{@_[0]}."m".@_[1]}s/.*\b(ERROR|ERR|WARNING|CRITICAL|DEBUG|INFO)\b.*/c($1,$&)/ge;'
 }
 
 # Run cake testcase.
