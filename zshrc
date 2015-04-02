@@ -38,7 +38,7 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 ###############################################################################
 # SET PATHS:                                                                  #
 ###############################################################################
-path=(~/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin /usr/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+path=(~/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
