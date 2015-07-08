@@ -16,6 +16,7 @@
 
 \echo 'SET search_path TO' :sp
 set search_path = :sp;
+set client_encoding to 'utf8';
 
 -------------
 -- HISTORY --

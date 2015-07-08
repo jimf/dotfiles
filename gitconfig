@@ -42,6 +42,7 @@
 	p = cherry-pick -s
 	pom = push origin master
 	pick = cherry-pick
+	pul = pull
 	prune-remotes = "!for remote in `git remote`; do git remote prune $remote; done"
 	r = remote
 	ra = !git log --graph --abbrev-commit --date=relative -20 --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
