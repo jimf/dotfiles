@@ -74,7 +74,7 @@ typeset -gU path cdpath manpath fpath
 # (( ${+PGHOST} )) || export PGHOST=yugg.colo.lair
 # (( ${+PGPORT} )) || export PGPORT=6000
 # (( ${+PGDATABASE} )) || export PGDATABASE=app
-(( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
+(( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/lib/node_modules:/usr/local/n/versions/0.12.7/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
 (( ${+NODE_PATH} )) || export REPORTTIME=10
 
 if [ -e /usr/share/terminfo/78/xterm-256color ] || [ -e /usr/share/terminfo/x/xterm-256color ]; then
