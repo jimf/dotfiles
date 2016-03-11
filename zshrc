@@ -38,7 +38,8 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 ###############################################################################
 # SET PATHS:                                                                  #
 ###############################################################################
-path=(~/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+export NODE_VERSION=$(node --version | tr -d v)
+path=(~/bin /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
@@ -62,7 +63,6 @@ typeset -gU path cdpath manpath fpath
 (( ${+EDITOR} )) || export EDITOR=`which vim`
 (( ${+VISUAL} )) || export VISUAL=`which vim`
 (( ${+FCEDIT} )) || export FCEDIT=`which vim`
-(( ${+PAGER} )) || export PAGER=`whence most || whence less`
 (( ${+LESSOPEN} )) || export LESSOPEN='|lesspipe.sh %s'
 (( ${+CC} )) || export CC='gcc'
 #(( ${+SVN_EDITOR} )) || export SVN_EDITOR='vim -f --noplugin'
@@ -74,12 +74,13 @@ typeset -gU path cdpath manpath fpath
 # (( ${+PGHOST} )) || export PGHOST=yugg.colo.lair
 # (( ${+PGPORT} )) || export PGPORT=6000
 # (( ${+PGDATABASE} )) || export PGDATABASE=app
-(( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/lib/node_modules:/usr/local/n/versions/0.12.7/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
+(( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/n/versions/node/$NODE_VERSION/lib/node_modules:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
 (( ${+NODE_PATH} )) || export REPORTTIME=10
 
 if [ -e /usr/share/terminfo/78/xterm-256color ] || [ -e /usr/share/terminfo/x/xterm-256color ]; then
     [ -n "$SSH_TTY" ] || export TERM=xterm-256color
 fi
+export PAGER="less -R"
 
 export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 case "$HOSTNAME" in
@@ -118,6 +119,10 @@ fi
 if [ -e "$HOME"/.rbenv ]; then
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init -)"
+fi
+
+if [ -e "$HOME"/perl5 ]; then
+    source "$HOME/perl5/perlbrew/etc/bashrc"
 fi
 
 # if command -v n >/dev/null 2>&1; then
