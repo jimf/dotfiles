@@ -62,6 +62,7 @@
 	sma = submodule add
 	smu = submodule update --init
 	st = status
+	stashgrep = "!stashgrep() { IFS=$'\n'; for i in `git stash list --format='%gd'`; do git stash show -p $i | grep -H --label=\"$i\" \"$1\"; done; }; stashgrep"
 	tagchanges = "!git log `git lasttag`... --date=relative --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'"
 	tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | grep -v feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | grep -v feature | xargs git branch -d
 	tidy-dryrun = !git remote prune --dry-run origin && git branch -r --merged master | grep -v 'master$' | grep -v feature | sed 's%origin/%%' | xargs -I% echo [remote] % && git branch --merged master | grep -v 'master$' | grep -v feature | xargs -I% echo [local] %
