@@ -38,7 +38,7 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 ###############################################################################
 # SET PATHS:                                                                  #
 ###############################################################################
-export NODE_VERSION=$(node --version | tr -d v)
+command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
 path=(~/bin /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
