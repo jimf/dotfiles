@@ -51,6 +51,7 @@ alias psmem="ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS"
 ## Utility ##
 alias dateR="python -c 'from email.Utils import formatdate; print formatdate(localtime=True)'"
 alias ping='ping -c 3'
+alias pypath="python -c 'import sys; print "'":"'".join([p for p in sys.path if p])'"
 alias unbz2='tar xjf'
 alias untgz='tar xzf'
 alias wget='wget -c'
@@ -422,6 +423,15 @@ function epoch2date() {
             fi
         done
     fi
+}
+
+function splitpath() {
+   if test -n "$1"
+   then
+      echo "$1" | tr ':' "\n"
+   else
+      (while read line; do echo $line | tr ':' "\n"; done)
+   fi
 }
 
 function green() {
