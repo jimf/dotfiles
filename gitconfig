@@ -39,7 +39,7 @@
 	m = merge
 	mb = merge --no-commit --no-ff @{-1}
 	mm = merge master
-	msg = commit --allow-empty -m
+	msg = log --format=%B -n1
 	p = cherry-pick -s
 	pom = push origin master
 	pick = cherry-pick
