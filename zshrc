@@ -125,6 +125,14 @@ if [ -e "$HOME"/perl5 ]; then
     source "$HOME/perl5/perlbrew/etc/bashrc"
 fi
 
+if command -v pyenv > /dev/null; then
+    eval "$(pyenv init -)"
+fi
+
+if command -v pyenv-virtualenv-init > /dev/null; then
+    eval "$(pyenv virtualenv-init -)"
+fi
+
 # if command -v n >/dev/null 2>&1; then
 #     export PATH="$(dirname $(n bin $(n --stable))):$PATH"
 # fi
