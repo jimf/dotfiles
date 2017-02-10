@@ -29,6 +29,7 @@
 	done = "!git push origin `git branchname`; sleep 1; git browse newpull"
 	div = divergence
 	ds = diff --staged
+	forcepull = "!git fetch; git reset --hard @{u}"
 	h = help
 	irb = rebase --interactive
 	l = log --abbrev-commit --date=relative --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
