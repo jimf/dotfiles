@@ -29,7 +29,7 @@ DISABLE_AUTO_UPDATE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(extract vagrant npm grunt)
+plugins=(extract vagrant npm grunt rbenv)
 builtin which -s git &>/dev/null && plugins+=(git)
 
 source $ZSH/oh-my-zsh.sh &>/dev/null
@@ -43,9 +43,8 @@ path=(~/bin /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/loc
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
-cdpath=(. ~ ~/Desktop ~/svn/trunk/code/sites/aweber_app ~/svn/trunk/code/awlib)
-manpath=(/usr/local/man /usr/share/man)
-manpath=($manpath /usr/man)
+cdpath=(. ~ ~/git)
+manpath=(/usr/local/man /usr/share/man /usr/man)
 [ -d ~/.zfunc ] && fpath=(~/.zfunc $fpath)
 export FPATH="$FPATH:/opt/local/share/zsh/site-functions/"
 if [ -f /opt/local/etc/profile.d/autojump.sh ]; then
@@ -102,6 +101,17 @@ case $TERM in
     ;;
 esac
 
+if [ -e "$HOME"/perl5 ]; then
+    source "$HOME/perl5/perlbrew/etc/bashrc"
+fi
+
+if command -v pyenv > /dev/null; then
+    eval "$(pyenv init -)"
+fi
+
+if command -v pyenv-virtualenv-init > /dev/null; then
+    eval "$(pyenv virtualenv-init -)"
+fi
 
 # According to http://nicolas.barcet.com/drupal/screen-by-default, -xRR is better
 if [ -n "$SSH_TTY" ]; then
@@ -115,24 +125,3 @@ if [ -n "$SSH_TTY" ]; then
         [ -f /etc/zsh/zprofile ] && [ "$EUID" != 0 ] && source /etc/zsh/zprofile
     fi
 fi
-
-if [ -e "$HOME"/.rbenv ]; then
-    export PATH="$HOME/.rbenv/bin:$PATH"
-    eval "$(rbenv init -)"
-fi
-
-if [ -e "$HOME"/perl5 ]; then
-    source "$HOME/perl5/perlbrew/etc/bashrc"
-fi
-
-if command -v pyenv > /dev/null; then
-    eval "$(pyenv init -)"
-fi
-
-if command -v pyenv-virtualenv-init > /dev/null; then
-    eval "$(pyenv virtualenv-init -)"
-fi
-
-# if command -v n >/dev/null 2>&1; then
-#     export PATH="$(dirname $(n bin $(n --stable))):$PATH"
-# fi
