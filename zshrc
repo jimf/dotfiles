@@ -39,12 +39,12 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 # SET PATHS:                                                                  #
 ###############################################################################
 command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
-path=(~/bin /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
 cdpath=(. ~ ~/git)
-manpath=(/usr/local/man /usr/share/man /usr/man)
+manpath=(/usr/local/man /usr/local/share/man /usr/share/man /usr/man)
 [ -d ~/.zfunc ] && fpath=(~/.zfunc $fpath)
 export FPATH="$FPATH:/opt/local/share/zsh/site-functions/"
 if [ -f /opt/local/etc/profile.d/autojump.sh ]; then
@@ -65,8 +65,8 @@ typeset -gU path cdpath manpath fpath
 (( ${+LESSOPEN} )) || export LESSOPEN='|lesspipe.sh %s'
 (( ${+CC} )) || export CC='gcc'
 #(( ${+SVN_EDITOR} )) || export SVN_EDITOR='vim -f --noplugin'
-(( ${+SVN_EDITOR} )) || export SVN_EDITOR=`which vim`
-(( ${+GIT_EDITOR} )) || export GIT_EDITOR=`which vim`
+(( ${+SVN_EDITOR} )) || export SVN_EDITOR=`builtin which vim`
+(( ${+GIT_EDITOR} )) || export GIT_EDITOR=`builtin which vim`
 (( ${+DATE} )) || export DATE=`date +%m-%d`
 (( ${+YDATE} )) || export YDATE=`date +%Y-%m-%d`
 (( ${+VERSIONER_PERL_PREFER_32_BIT} )) || export VERSIONER_PERL_PREFER_32_BIT=yes
