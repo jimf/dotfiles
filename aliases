@@ -32,6 +32,8 @@ alias ll='ls -lh'
 alias lt='ls -t1'
 alias mkdir='mkdir -p'
 alias npm-exec='PATH=$(npm bin):$PATH'
+alias npms='jq ".scripts" ./package.json'
+alias npmv='jq ".version" ./package.json'
 alias npmoutdated="npm -s outdated | egrep -v '>'"
 alias nt='python setup.py -q nosetests'
 alias pd='python setup.py develop'
