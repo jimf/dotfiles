@@ -38,8 +38,9 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 ###############################################################################
 # SET PATHS:                                                                  #
 ###############################################################################
-command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
-path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+# command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
+# path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
@@ -73,23 +74,28 @@ typeset -gU path cdpath manpath fpath
 # (( ${+PGHOST} )) || export PGHOST=yugg.colo.lair
 # (( ${+PGPORT} )) || export PGPORT=6000
 # (( ${+PGDATABASE} )) || export PGDATABASE=app
-(( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/n/versions/node/$NODE_VERSION/lib/node_modules:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
+# (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/n/versions/node/$NODE_VERSION/lib/node_modules:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
+# (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/bin:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
 (( ${+REPORTTIME} )) || export REPORTTIME=10
 
-if [ -e /usr/share/terminfo/78/xterm-256color ] || [ -e /usr/share/terminfo/x/xterm-256color ]; then
-    [ -n "$SSH_TTY" ] || export TERM=xterm-256color
+if [ -z "$SSH_TTY" ] && [ -z "$TMUX" ]; then
+    if [ -e /usr/share/terminfo/78/xterm-256color ] || [ -e /usr/share/terminfo/x/xterm-256color ]; then
+        export TERM=xterm-256color
+    fi
 fi
 export PAGER="less -R"
 
 export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
-case "$HOSTNAME" in
-    dev*)
-        export SERVERTYPE='dev'
-        ;;
-    *)
-        export SERVERTYPE='critical'
-        ;;
-esac
+if [ -n "$SSH_TTY" ]; then
+    case "$HOSTNAME" in
+        dev*)
+            export SERVERTYPE='dev'
+            ;;
+        *)
+            export SERVERTYPE='critical'
+            ;;
+    esac
+fi
 
 if [ "`id -u`" -eq 0 ] || [[ "$SERVERTYPE" == critical ]]; then
    TMOUT=900  # 15 min timeout

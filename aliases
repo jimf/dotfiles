@@ -131,6 +131,10 @@ function colorlogging() {
     perl -pe 'sub c {%c=("ERROR",31,"ERR",31,"INFO",32,"DEBUG",36,"WARNING",33,"CRITICAL",35);"\e[1;".$c{@_[0]}."m".@_[1]}s/.*\b(ERROR|ERR|WARNING|CRITICAL|DEBUG|INFO)\b.*/c($1,$&)/ge;'
 }
 
+function colorhttp() {
+    perl -pe 'sub c {%c=("5",31,"4",33);"\e[1;".$c{@_[0]}."m".@_[1]}s#.* HTTP/1.1" (2|4|5)\d\d .*#c($1,$&)#ge;'
+}
+
 # Run cake testcase.
 function caketestcase () {
     php -q /home/sites/cake_core/1.2b/cake/console/cake.php -app /home/sites/$1 testsuite app case $2
