@@ -40,7 +40,7 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 ###############################################################################
 # command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
 # path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
-path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+path=(~/bin ~/.cargo/bin /Applications/MacVim.app/Contents/MacOS /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
