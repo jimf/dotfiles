@@ -29,7 +29,8 @@ DISABLE_AUTO_UPDATE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(extract vagrant npm grunt rbenv)
+# plugins=(extract vagrant npm grunt rbenv)
+plugins=(npm)
 builtin which -s git &>/dev/null && plugins+=(git)
 
 source $ZSH/oh-my-zsh.sh &>/dev/null
@@ -40,11 +41,12 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 ###############################################################################
 # command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
 # path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
-path=(~/bin ~/.cargo/bin /Applications/MacVim.app/Contents/MacOS /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+export GOPATH=$HOME/go
+path=(~/bin ~/.cargo/bin /usr/local/bin /Applications/MacVim.app/Contents/MacOS /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin /usr/local/go/bin $GOPATH/bin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
-cdpath=(. ~ ~/git)
+cdpath=(. ~)
 manpath=(/usr/local/man /usr/local/share/man /usr/share/man /usr/man)
 [ -d ~/.zfunc ] && fpath=(~/.zfunc $fpath)
 export FPATH="$FPATH:/opt/local/share/zsh/site-functions/"
@@ -78,6 +80,16 @@ typeset -gU path cdpath manpath fpath
 # (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/bin:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
 (( ${+REPORTTIME} )) || export REPORTTIME=10
 
+# Configure FZF
+if command -v fd > /dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+    export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git'
+fi
+
+command -v bat > /dev/null && export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {}'"
+command -v tree > /dev/null && export FZF_ALT_C_OPTS="--preview 'tree -C {}'"
+
 if [ -z "$SSH_TTY" ] && [ -z "$TMUX" ]; then
     if [ -e /usr/share/terminfo/78/xterm-256color ] || [ -e /usr/share/terminfo/x/xterm-256color ]; then
         export TERM=xterm-256color
@@ -107,16 +119,24 @@ case $TERM in
     ;;
 esac
 
-if [ -e "$HOME"/perl5 ]; then
-    source "$HOME/perl5/perlbrew/etc/bashrc"
+# if [ -e "$HOME"/perl5 ]; then
+#     source "$HOME/perl5/perlbrew/etc/bashrc"
+# fi
+
+# if command -v pyenv > /dev/null; then
+#     eval "$(pyenv init -)"
+# fi
+
+# if command -v pyenv-virtualenv-init > /dev/null; then
+#     eval "$(pyenv virtualenv-init -)"
+# fi
+
+if command -v rbenv > /dev/null; then
+    eval "$(rbenv init -)"
 fi
 
-if command -v pyenv > /dev/null; then
-    eval "$(pyenv init -)"
-fi
-
-if command -v pyenv-virtualenv-init > /dev/null; then
-    eval "$(pyenv virtualenv-init -)"
+if [ -f "$HOME/.env-private" ]; then
+    export $(grep -v '^#' "$HOME/.env-private" | xargs)
 fi
 
 # According to http://nicolas.barcet.com/drupal/screen-by-default, -xRR is better

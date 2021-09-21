@@ -19,8 +19,6 @@ alias tree='tree -CF'
 
 ## Convenience ##
 alias cpan='sudo perl -MCPAN -e shell'
-#alias currtag='svn ls svn+ssh://scm/aweber/branches/rel | sort -n -t . -k 1,1 -k 2,2 | tr -d / | tail -n1'
-alias gist='open "https://github.aweber.io/gist"'
 alias h="history -1 | sed 's/^\s*[0-9]\+\s*//'"
 alias l.='ls -dF .[a-zA-Z0-9]*'
 alias la='ls -a'
@@ -30,8 +28,11 @@ alias lf.='ls .*(.)'
 alias lf='ls *(.)'
 alias ll='ls -lh'
 alias lt='ls -t1'
+alias lsr='listrepos'
 alias mkdir='mkdir -p'
 alias npm-exec='PATH=$(npm bin):$PATH'
+alias awnpm='npm_config_registry=$AWEBER_NPM_REGISTRY npm'
+alias npmaw='npm_config_registry=$AWEBER_NPM_REGISTRY npm'
 alias npms='jq ".scripts" ./package.json'
 alias npmv='jq ".version" ./package.json'
 alias npmoutdated="npm -s outdated | egrep -v '>'"
@@ -52,12 +53,12 @@ alias psmem="ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS"
 
 ## Utility ##
 alias dateR="python -c 'from email.Utils import formatdate; print formatdate(localtime=True)'"
+alias datetag="date '+%Y%m%d-%H%M'"
 alias ping='ping -c 3'
 alias pypath="python -c 'import sys; print "'":"'".join([p for p in sys.path if p])'"
 alias unbz2='tar xjf'
 alias untgz='tar xzf'
 alias wget='wget -c'
-alias whichdb='grep aweber_app:live -A1 ~/svn/system/config/etc/database_login.ini | tail -n1 | cut -d= -f2'
 
 ## Fast fingers ##
 alias dkpg='dpkg'
@@ -68,6 +69,7 @@ alias :q='exit'
 alias snv='svn'
 alias sqpl='sqlp'
 
+alias cl='awchangelog --overwrite'
 
 ## Functions ##
 
@@ -213,6 +215,22 @@ function growl () {
 #   fi
 #}
 alias unpack='extract'
+
+function lab() {
+    local input=""
+
+    if [[ -p /dev/stdin ]]; then
+        input="$(cat -)"
+    else
+        input="${@}"
+    fi
+
+    if [[ -n "$input" ]]; then
+        open "${GITLAB_HOST}/${input}"
+    elif [[ -d "./.git" ]]; then
+        open `git remote -v | grep fetch | head -1 | cut -f2 | cut -d' ' -f1 | sed -e's/git@/http:\/\//' -e's/\.git$//' | sed -E 's/(\/\/[^:]*):/\1\//'`
+    fi
+}
 
 # Echo a specific line of a file.
 line (){
@@ -427,6 +445,17 @@ function epoch2date() {
             else
                 date -d "1970-01-01 $line sec GMT"
             fi
+        done
+    fi
+}
+
+function px2rem() {
+    if test -n "$1"; then
+        line=$1
+        awk 'BEGIN {printf "%srem\n", '${line%%px}'/16}'
+    else
+        while read line; do
+            awk 'BEGIN {printf "%srem\n", '${line%%px}'/16}'
         done
     fi
 }

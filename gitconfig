@@ -4,7 +4,7 @@
 [color]
 	ui = auto
 [alias]
-	a = add
+	a = "!git ls-files -m --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add"
 	aa = add --all
 	ae = add --edit
 	ai = add --interactive
@@ -66,9 +66,9 @@
 	st = status
 	stashgrep = "!stashgrep() { IFS=$'\n'; for i in `git stash list --format='%gd'`; do git stash show -p $i | grep -H --label=\"$i\" \"$1\"; done; }; stashgrep"
 	tagchanges = "!git log `git lasttag`... --date=relative --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --no-merges"
-	tagchanges-jira = "!git log `git lasttag`... | grep -Eo '[a-zA-Z]+-[0-9]+' | tr /a-z/ /A-Z/ | sort | uniq | sed -e 's#^#https://jira.aweber.io/browse/#'"
-	tidy = !git remote prune origin && git branch -r --merged master | grep -v 'master$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | grep -v -i feature | xargs git branch -d
-	tidymain = !git remote prune origin && git branch -r --merged main | grep -v 'main$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged main | grep -v 'main$' | grep -v -i feature | xargs git branch -d
+	tagchanges-jira = "!git log `git lasttag`... | grep -Eo '[a-zA-Z]+-[0-9]+' | tr /a-z/ /A-Z/ | sort | uniq | sed -e \"s#^#$JIRA_HOST/browse/#\""
+	tidy = !git remote prune origin && git branch -r --merged master | grep origin | grep -v 'master$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | grep -v -i feature | xargs git branch -d
+	tidymain = !git remote prune origin && git branch -r --merged main | grep -v 'main$' | grep origin | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged main | grep -v 'main$' | grep -v -i feature | xargs git branch -d
 	tidy-dryrun = !git remote prune --dry-run origin && git branch -r --merged master | grep -v 'master$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% echo [remote] % && git branch --merged master | grep -v 'master$' | grep -v -i feature | xargs -I% echo [local] %
 	undo = reset --soft HEAD^
 	unstage = reset HEAD --
@@ -82,8 +82,6 @@
 	excludesfile = ~/.cvsignore
 	pager = less -FX
 	whitespace = trailing-space,space-before-tab
-[github]
-	host = github.aweber.io
 [diff]
 	mnemonicprefix = true
 	tool = vimdiff
@@ -91,8 +89,7 @@
 	prompt = false
 [merge]
 	tool = gvimdiff
-[hub]
-	host = github.aweber.io
-	protocol = http
 [push]
 	default = simple
+[pull]
+	rebase = false
