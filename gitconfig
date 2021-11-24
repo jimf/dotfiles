@@ -79,7 +79,7 @@
 	push = push --tags
 	showtrackedignored = ls-files -i --exclude-standard
 [core]
-	excludesfile = ~/.cvsignore
+	excludesfile = /Users/jimf/.gitignore_global
 	pager = less -FX
 	whitespace = trailing-space,space-before-tab
 [diff]

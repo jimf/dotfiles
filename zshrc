@@ -40,14 +40,14 @@ source $ZSH/oh-my-zsh.sh &>/dev/null
 # SET PATHS:                                                                  #
 ###############################################################################
 # command -v node >/dev/null 2>&1 && export NODE_VERSION=$(node --version | tr -d v)
-# path=(~/bin /Applications/MacVim.app/Contents/MacOS /usr/local/n/versions/node/$NODE_VERSION/bin /usr/local/bin /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin)
+export N_PREFIX=$HOME/n
 export GOPATH=$HOME/go
-path=(~/bin ~/.cargo/bin /usr/local/bin /Applications/MacVim.app/Contents/MacOS /opt/local/Library/Frameworks/Python.framework/Versions/2.6/bin /opt/local/bin $path /bin /usr/bin /opt/awutil /opt/awbin /usr/local/go/bin $GOPATH/bin)
+path=(~/bin ~/n/bin ~/.npm-global/bin ~/.cargo/bin /usr/local/bin /Applications/MacVim.app/Contents/MacOS /opt/local/bin $path /bin /usr/bin /usr/local/go/bin $GOPATH/bin)
 if (( $EUID == 0 )); then
     path=($path /sbin /usr/sbin /usr/local/sbin)
 fi
 cdpath=(. ~)
-manpath=(/usr/local/man /usr/local/share/man /usr/share/man /usr/man)
+manpath=(~/.npm-global/share/man /usr/local/man /usr/local/share/man /usr/share/man /usr/man)
 [ -d ~/.zfunc ] && fpath=(~/.zfunc $fpath)
 export FPATH="$FPATH:/opt/local/share/zsh/site-functions/"
 if [ -f /opt/local/etc/profile.d/autojump.sh ]; then
@@ -67,17 +67,11 @@ typeset -gU path cdpath manpath fpath
 (( ${+FCEDIT} )) || export FCEDIT=`which vim`
 (( ${+LESSOPEN} )) || export LESSOPEN='|lesspipe.sh %s'
 (( ${+CC} )) || export CC='gcc'
-#(( ${+SVN_EDITOR} )) || export SVN_EDITOR='vim -f --noplugin'
 (( ${+SVN_EDITOR} )) || export SVN_EDITOR=`builtin which vim`
 (( ${+GIT_EDITOR} )) || export GIT_EDITOR=`builtin which vim`
 (( ${+DATE} )) || export DATE=`date +%m-%d`
 (( ${+YDATE} )) || export YDATE=`date +%Y-%m-%d`
 (( ${+VERSIONER_PERL_PREFER_32_BIT} )) || export VERSIONER_PERL_PREFER_32_BIT=yes
-# (( ${+PGHOST} )) || export PGHOST=yugg.colo.lair
-# (( ${+PGPORT} )) || export PGPORT=6000
-# (( ${+PGDATABASE} )) || export PGDATABASE=app
-# (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/n/versions/node/$NODE_VERSION/lib/node_modules:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
-# (( ${+NODE_PATH} )) || export NODE_PATH=/usr/local/bin:/usr/local/lib/node_modules:/usr/local/lib/jsctags/:$HOME/git/doctorjs/lib/jsctags/:$NODE_PATH
 (( ${+REPORTTIME} )) || export REPORTTIME=10
 
 # Configure FZF
