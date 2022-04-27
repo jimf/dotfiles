@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# git hook to prepare the commit log message. If the branch name begins with a
+# Jira ticket slug, this script prepends that slug to the commit message
+# subject.
+#
+# https://stackoverflow.com/questions/5894946/how-to-add-gits-branch-name-to-the-commit-message/
+
+branchPath=$(git symbolic-ref -q HEAD)
+branchName=${branchPath##*/}
+pattern="([A-Z]+-[0-9]+)-.+"
+
+if [[ $branchName =~ $pattern ]]; then
+    # Get the captured portion of the branch name.
+    jiraSlug=${BASH_REMATCH[1]}
+    originalMessage=`cat $1`
+
+    # Prepend Jira slug if the commit does not already include it.
+    if [[ $originalMessage != $jiraSlug* ]]; then
+        sed -i '.bak' "1s/^/$jiraSlug: /" $1
+    fi
+fi

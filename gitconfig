@@ -22,11 +22,11 @@
 	cm = commit --message
 	co = checkout
 	cob = checkout -b
-	com = checkout master
+	com = "!git checkout `git defaultbranch`"
 	cpc = cherry-pick
-	d = diff
+	d = "!git ls-files -m --exclude-standard | fzf --print0 -m | xargs -0 -t -o git diff"
 	dc = diff --cached
-        #done = "!git push origin `git branchname`; sleep 1; git browse newpull"
+	defaultbranch = "!git show-ref --verify --quiet refs/heads/main && echo 'main' || echo 'master'"
 	done = "!git push origin `git branchname` && open $GITLAB_HOST"
 	div = divergence
 	ds = diff --staged
@@ -53,7 +53,7 @@
 	rba = rebase --abort
 	rbc = rebase --continue
 	rbs = rebase --skip
-	rbm = rebase master
+	rbm = !git rebase `git defaultbranch`
 	repush = "!git push origin `git branchname`"
 	rh = reset --hard
 	rmb = !sh -c 'git branch -D $1 && git push origin :$1' -
@@ -67,7 +67,8 @@
 	stashgrep = "!stashgrep() { IFS=$'\n'; for i in `git stash list --format='%gd'`; do git stash show -p $i | grep -H --label=\"$i\" \"$1\"; done; }; stashgrep"
 	tagchanges = "!git log `git lasttag`... --date=relative --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset' --no-merges"
 	tagchanges-jira = "!git log `git lasttag`... | grep -Eo '[a-zA-Z]+-[0-9]+' | tr /a-z/ /A-Z/ | sort | uniq | sed -e \"s#^#$JIRA_HOST/browse/#\""
-	tidy = !git remote prune origin && git branch -r --merged master | grep origin | grep -v 'master$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | grep -v -i feature | xargs git branch -d
+	tidy = !git show-ref --verify --quiet refs/heads/main && git tidymain || git tidymaster
+	tidymaster = !git remote prune origin && git branch -r --merged master | grep origin | grep -v 'master$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged master | grep -v 'master$' | grep -v -i feature | xargs git branch -d
 	tidymain = !git remote prune origin && git branch -r --merged main | grep -v 'main$' | grep origin | grep -v -i feature | sed 's%origin/%%' | xargs -I% git push origin :% && git branch --merged main | grep -v 'main$' | grep -v -i feature | xargs git branch -d
 	tidy-dryrun = !git remote prune --dry-run origin && git branch -r --merged master | grep -v 'master$' | grep -v -i feature | sed 's%origin/%%' | xargs -I% echo [remote] % && git branch --merged master | grep -v 'master$' | grep -v -i feature | xargs -I% echo [local] %
 	undo = reset --soft HEAD^
@@ -92,4 +93,4 @@
 [push]
 	default = simple
 [pull]
-	rebase = false
+	rebase = true
